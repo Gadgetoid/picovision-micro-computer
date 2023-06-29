@@ -1,6 +1,11 @@
 {
     "cmake.configureSettings": {
-        // "PICO_SDK_PATH": "../../pico-sdk" // <-- Set this if you've not set ${env:PICO_SDK_PATH}
+        "PICO_SDK_PATH": "../../pico-sdk", // <-- Set this if you've not set ${env:PICO_SDK_PATH}
+        "PICO_BOARD": "pico_w",
     },
-    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "files.associations": {
+        "cstddef": "cpp",
+        "ranges": "cpp"
+    }
 }

@@ -2,6 +2,7 @@
     // Use IntelliSense to learn about possible attributes.
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    // openocd -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c "adapter speed 5000"
     "version": "0.2.0",
     "configurations": [
         {
@@ -13,8 +14,11 @@
             "servertype": "openocd",
             "gdbPath": "/usr/bin/gdb-multiarch",
             "device": "RP2040",
+            "openOCDLaunchCommands": [
+                "adapter speed 5000"
+            ],
             "configFiles": [
-                "interface/picoprobe.cfg",
+                "interface/cmsis-dap.cfg",
                 "target/rp2040.cfg"
             ],
             "svdFile": "${env:PICO_SDK_PATH}/src/rp2040/hardware_regs/rp2040.svd",
