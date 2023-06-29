@@ -29,6 +29,7 @@ include(drivers/fatfs/fatfs)
 include(drivers/aps6404/aps6404)
 include(libraries/jpegdec/jpegdec)
 include(drivers/sdcard/sdcard)
+add_subdirectory(lua-5.4.6/src)
 
 # Don't forget to link the libraries you need!
 target_link_libraries(${NAME}
@@ -44,10 +45,12 @@ target_link_libraries(${NAME}
     fatfs
     jpegdec
     sdcard
+    lua
 )
 
 target_include_directories(${NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
+    lua-5.4.6/src
 )
 
 target_compile_definitions(${NAME} PRIVATE
@@ -64,6 +67,10 @@ pico_add_extra_outputs(${NAME})
 
 pico_enable_stdio_uart(${NAME} 1)
 pico_enable_stdio_usb(${NAME} 0)
+
+target_link_options(${NAME} PRIVATE
+    -Wl,--print-memory-usage
+)
 
 # Set up files for the release packages
 install(FILES

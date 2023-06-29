@@ -6,10 +6,14 @@
 #include "drivers/dv_display/dv_display.hpp"
 #include "libraries/pico_graphics/pico_graphics.hpp"
 
+#include "lua.hpp"
+
 #define FRAME_WIDTH 640
 #define FRAME_HEIGHT 480
 
 using namespace pimoroni;
+
+lua_State *L;
 
 DVDisplay display;
 PicoGraphics_PenDV_RGB555 graphics(FRAME_WIDTH, FRAME_HEIGHT, display);
@@ -27,6 +31,9 @@ uint8_t KEY_STATE_NONE    = 0b00000000;
 uint8_t KEY_STATE_PRESS   = 0b00000001;
 uint8_t KEY_STATE_RELEASE = 0b00000010;
 uint8_t KEY_STATE_REPEAT  = 0b00000100;
+
+char input_buffer[256];
+char *input_ptr = &input_buffer[0];
 
 
 void mouse_callback(int8_t x, int8_t y, uint8_t buttons, int8_t wheel) {
@@ -94,6 +101,26 @@ void keyboard_callback(uint8_t *keys, uint8_t modifiers) {
         } else {
             keys_pressed[i] = keys[i];
             keys_state[i] = KEY_STATE_PRESS;
+            if(keys[i] >= KEY_A && keys[i] < KEY_A + 26 + 10) {
+                if(modifiers & (MOD_RSHF | MOD_LSHF)) {
+                    *input_ptr = ukeys[keys[i] - KEY_A];
+                } else {
+                    *input_ptr = lkeys[keys[i] - KEY_A];
+                }
+                input_ptr++;
+            } else if (keys[i] == KEY_ENTER) {
+                luaL_dostring(L, input_buffer);
+                input_ptr = &input_buffer[0];
+                memset(input_buffer, 0, sizeof(input_buffer));
+            } else if (keys[i] == KEY_SPACE) {
+                *input_ptr = ' ';
+                input_ptr++;
+            } else if (keys[i] == KEY_BACKSPACE) {
+                if(input_ptr > &input_buffer[0]) {
+                    input_ptr--;
+                    *input_ptr = '\0';
+                }
+            }
         }
     }
 }
@@ -114,6 +141,13 @@ int main() {
     init_usb();
     printf("Done!\n");
 
+    printf("Init Lua...\n");
+    L = luaL_newstate();
+    luaL_openlibs(L);
+    luaL_dostring(L, "x = \"Lua Hello World\"");
+    luaL_dostring(L, "print(x)");
+    printf("Done!\n");
+
     printf("Init Video...\n");
     display.init(FRAME_WIDTH, FRAME_HEIGHT, DVDisplay::MODE_RGB555);
     graphics.set_pen(graphics.create_pen(0, 0, 0));
@@ -122,17 +156,24 @@ int main() {
     graphics.clear();
     printf("Done!\n");
 
+
     Point last_cursor = cursor;
 
     while(true) {
         update_usb();
         update_arrow_key_cursor();
 
+        /*if(key_pressed(KEY_SPACE)) {
+            luaL_dostring(L, "x = \"Lua Hello World\"");
+            luaL_dostring(L, "print(x)");
+        }*/
+
         graphics.set_pen(graphics.create_pen(0, 0, 0));
         graphics.clear();
         graphics.set_pen(graphics.create_pen(255, 255, 255));
         graphics.text("PicoVision Micro Computer v0.1 Alpha", Point(0, 0), FRAME_WIDTH);
- 
+        graphics.text(input_buffer, Point(0, 10), FRAME_WIDTH);
+
         graphics.set_pen(graphics.create_pen(255, 0, 0));
         graphics.circle(cursor, cursor_size);
 

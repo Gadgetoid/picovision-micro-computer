@@ -12,7 +12,7 @@ key MOD_RSHF = 0b00100000;
 key MOD_RALT = 0b01000000;
 
 const char lkeys[] = "abcdefghijklmnopqrstuvwxyz1234567890";
-const char ukeys[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!\"£$%^&*()";
+const char ukeys[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!\"3$%^&*()";
 
 key KEY_A = 4; // Not ASCII then...
 

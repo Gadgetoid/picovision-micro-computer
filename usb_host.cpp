@@ -44,7 +44,6 @@ void tuh_hid_umount_cb(uint8_t dev_addr, uint8_t instance) {
   hid_keyboard_detected = false;
 }
 
-// should this be here or in input.cpp?
 void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* report, uint16_t len) {
 
   auto report_data = hid_report_id == -1 ? report : report + 1;
@@ -72,20 +71,13 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
   if(protocol == HID_ITF_PROTOCOL_MOUSE) {
     hid_mouse_detected = true;
     auto mouse_report = (hid_mouse_report_t const*) report;
-    printf("Mouse %i %i %i 0b%s%s\n", mouse_report->x, mouse_report->y,
+    printf("Mouse %i %i %i 0b%s%s\n", mouse_report->x, mouse_report->y, mouse_report->wheel,
             nibble_to_bitstring[mouse_report->buttons >> 4],
             nibble_to_bitstring[mouse_report->buttons & 0x0F]);
     mouse_callback(mouse_report->x, mouse_report->y, mouse_report->buttons, mouse_report->wheel);
   }
 
   tuh_hid_receive_report(dev_addr, instance);
-}
-
-// cdc
-static uint8_t cdc_index = 0; // TODO: multiple devices?
-
-void tuh_cdc_mount_cb(uint8_t idx) {
-  cdc_index = idx;
 }
 
 void init_usb() {
@@ -100,35 +92,4 @@ void update_usb() {
 
 void usb_debug(const char *message) {
 
-}
-
-bool usb_cdc_connected() {
-  //return tuh_cdc_mounted(cdc_index);
-  return false;
-}
-
-uint16_t usb_cdc_read(uint8_t *data, uint16_t len) {
-  //return tuh_cdc_read(cdc_index, data, len);
-  return 0u;
-}
-
-uint32_t usb_cdc_read_available() {
-  //return tuh_cdc_read_available(cdc_index);
-  return 0u;
-}
-
-void usb_cdc_write(const uint8_t *data, uint16_t len) {
- /* uint32_t done = tuh_cdc_write(cdc_index,data, len);
-
-  while(done < len) {
-    tuh_task();
-    if(!tuh_cdc_mounted(cdc_index))
-      break;
-
-    done += tuh_cdc_write(cdc_index, data + done, len - done);
-  }*/
-}
-
-void usb_cdc_flush_write() {
-  //tuh_cdc_write_flush(cdc_index);
 }
