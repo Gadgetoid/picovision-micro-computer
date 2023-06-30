@@ -86,43 +86,86 @@ void update_arrow_key_cursor() {
     key_cursor = key_cursor.clamp(graphics.bounds);
 }
 
+bool find_key_in(uint8_t key, uint8_t *keys) {
+    for(auto i = 0u; i < 6u; i++) {
+        if(keys[i] == key) return true;
+    }
+    return false;
+}
+
 void keyboard_callback(uint8_t *keys, uint8_t modifiers) {
+    // Clear released keys
     for(auto i = 0u; i < 6; i++) {
-        if(keys[i] == 0) {
-            if(keys_pressed[i] == 0) {
-                keys_state[i] = KEY_STATE_NONE;
-            } else {
-                keys_state[i] = KEY_STATE_RELEASE;
-                keys_pressed[i] = 0;
-            }
+        if(keys_state[i] == KEY_STATE_RELEASE) {
+            keys_state[i] = KEY_STATE_NONE;
+            keys_pressed[i] = 0;
         }
-        else if(keys[i] == keys_pressed[i]) {
-            keys_state[i] = KEY_STATE_REPEAT;
-        } else {
-            keys_pressed[i] = keys[i];
-            keys_state[i] = KEY_STATE_PRESS;
-            if(keys[i] >= KEY_A && keys[i] < KEY_A + 26 + 10) {
+    }
+
+    /*
+    For every key in `keys_pressed` that isn't in `keys`,
+    mark it as released.
+    */
+    for(auto i = 0u; i < 6; i++) {
+        if (!find_key_in(keys_pressed[i], keys)) {
+            keys_state[i] = KEY_STATE_RELEASE;
+        }
+    }
+
+
+   for(auto i = 0u; i < 6; i++) {
+            /*
+            For every key in `keys` that IS in `keys_pressed`,
+            update it to held.
+            */
+           if(find_key_in(keys[i], keys_pressed)) {
+            for(auto j = 0u; j < 6; j++) {
+                if(keys_pressed[j] == keys[i]) {
+                    keys_state[j] = KEY_STATE_REPEAT;
+                }
+            }
+           }else{
+            /*
+            For every key in `keys` that isn't in `keys_pressed`,
+            find it a slot.
+            */
+            for(auto j = 0u; j < 6; j++) {
+                if(keys_pressed[j] == 0) {
+                    keys_pressed[j] = keys[i];
+                    keys_state[j] = KEY_STATE_PRESS;
+                    break;
+                }
+            }
+           }
+   }
+
+   for(auto i = 0u; i < 6; i++) {
+        auto key = keys_pressed[i];
+        auto state = keys_state[i];
+
+        if(key && state == KEY_STATE_PRESS) {
+            if(key >= KEY_A && key < KEY_A + 26 + 10) {
                 if(modifiers & (MOD_RSHF | MOD_LSHF)) {
-                    *input_ptr = ukeys[keys[i] - KEY_A];
+                    *input_ptr = ukeys[key - KEY_A];
                 } else {
-                    *input_ptr = lkeys[keys[i] - KEY_A];
+                    *input_ptr = lkeys[key - KEY_A];
                 }
                 input_ptr++;
-            } else if (keys[i] == KEY_ENTER) {
+            } else if (key == KEY_ENTER) {
                 luaL_dostring(L, input_buffer);
                 input_ptr = &input_buffer[0];
                 memset(input_buffer, 0, sizeof(input_buffer));
-            } else if (keys[i] == KEY_SPACE) {
+            } else if (key == KEY_SPACE) {
                 *input_ptr = ' ';
                 input_ptr++;
-            } else if (keys[i] == KEY_BACKSPACE) {
+            } else if (key == KEY_BACKSPACE) {
                 if(input_ptr > &input_buffer[0]) {
                     input_ptr--;
                     *input_ptr = '\0';
                 }
             }
         }
-    }
+   }
 }
 
 struct line {
@@ -156,6 +199,7 @@ int main() {
     graphics.clear();
     printf("Done!\n");
 
+    graphics.set_font("bitmap8");
 
     Point last_cursor = cursor;
 
@@ -172,7 +216,7 @@ int main() {
         graphics.clear();
         graphics.set_pen(graphics.create_pen(255, 255, 255));
         graphics.text("PicoVision Micro Computer v0.1 Alpha", Point(0, 0), FRAME_WIDTH);
-        graphics.text(input_buffer, Point(0, 10), FRAME_WIDTH);
+        graphics.text(input_buffer, Point(0, 20), FRAME_WIDTH);
 
         graphics.set_pen(graphics.create_pen(255, 0, 0));
         graphics.circle(cursor, cursor_size);
