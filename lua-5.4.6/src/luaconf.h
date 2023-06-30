@@ -10,6 +10,12 @@
 
 #include <limits.h>
 #include <stddef.h>
+#include <stdint.h>
+
+extern void write_history(uint8_t cursor, const char *msg, size_t length);
+
+#define lua_writestring(s,l)   write_history(2, s, l);
+#define lua_writeline()   write_history(2, "", 1);
 
 
 /*
