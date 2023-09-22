@@ -13,11 +13,7 @@ set(CMAKE_CXX_STANDARD 17)
 # Initialize the SDK
 pico_sdk_init()
 
-# Add your source files
-add_executable(${NAME}
-    main.cpp # <-- Add source files here!
-    usb_host.cpp
-)
+include(picovision_import.cmake)
 
 # Include required libraries
 # This assumes `pimoroni-pico` is stored alongside your project
@@ -31,8 +27,15 @@ include(libraries/jpegdec/jpegdec)
 include(drivers/sdcard/sdcard)
 add_subdirectory(lua-5.4.6/src)
 
+# Add your source files
+add_executable(${NAME}
+    main.cpp # <-- Add source files here!
+    usb_host.cpp
+)
+
 # Don't forget to link the libraries you need!
 target_link_libraries(${NAME}
+    picovision
     pimoroni_i2c
     pico_stdlib
     tinyusb_board

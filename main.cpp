@@ -6,7 +6,7 @@
 #include "scancodes.h"
 
 #include "drivers/dv_display/dv_display.hpp"
-#include "libraries/pico_graphics/pico_graphics.hpp"
+#include "libraries/pico_graphics/pico_graphics_dv.hpp"
 
 #include "lua.hpp"
 
@@ -383,6 +383,7 @@ int main() {
     printf("Done!\n");
 
     printf("Init Video...\n");
+    display.preinit();
     display.init(FRAME_WIDTH, FRAME_HEIGHT, DVDisplay::MODE_RGB555);
     graphics.set_pen(graphics.create_pen(0, 0, 0));
     graphics.clear();
