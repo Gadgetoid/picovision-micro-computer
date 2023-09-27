@@ -19,10 +19,7 @@ include(picovision_import.cmake)
 # This assumes `pimoroni-pico` is stored alongside your project
 include(common/pimoroni_i2c)
 include(common/pimoroni_bus)
-include(drivers/dv_display/dv_display)
-include(libraries/pico_graphics/pico_graphics)
 include(drivers/fatfs/fatfs)
-include(drivers/aps6404/aps6404)
 include(libraries/jpegdec/jpegdec)
 include(drivers/sdcard/sdcard)
 add_subdirectory(lua-5.4.6/src)
@@ -44,7 +41,6 @@ target_link_libraries(${NAME}
     hardware_pio
     hardware_i2c
     hardware_uart
-    pico_graphics
     fatfs
     jpegdec
     sdcard
