@@ -19,7 +19,7 @@ jobs:
           - os: ubuntu-20.04
             name: Linux
             cache-key: linux
-            cmake-args: '-DPIMORONI_PICO_PATH=$GITHUB_WORKSPACE/pimoroni-pico -DPICO_SDK_PATH=$GITHUB_WORKSPACE/pico-sdk -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/install'
+            cmake-args: '-DPIMORONI_PICOVISION_PATH=$GITHUB_WORKSPACE/picovision -DPIMORONI_PICO_PATH=$GITHUB_WORKSPACE/pimoroni-pico -DPICO_SDK_PATH=$GITHUB_WORKSPACE/pico-sdk -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/install'
             apt-packages: clang-tidy gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib
 
     runs-on: ${{matrix.os}}
@@ -41,6 +41,13 @@ jobs:
       with:
         repository: pimoroni/pimoroni-pico
         path: pimoroni-pico
+
+    # Checkout the Pimoroni PicoVision Libraries
+    - name: Checkout Pimoroni PicoVision Libraries
+      uses: actions/checkout@v2
+      with:
+        repository: pimoroni/picovision
+        path: picovision
 
     # Checkout the Pico SDK
     - name: Checkout Pico SDK
