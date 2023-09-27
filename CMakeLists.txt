@@ -21,6 +21,7 @@ include(common/pimoroni_i2c)
 include(common/pimoroni_bus)
 include(drivers/fatfs/fatfs)
 include(libraries/jpegdec/jpegdec)
+include(libraries/pico_graphics/pico_graphics)
 include(drivers/sdcard/sdcard)
 add_subdirectory(lua-5.4.6/src)
 
@@ -33,14 +34,11 @@ add_executable(${NAME}
 # Don't forget to link the libraries you need!
 target_link_libraries(${NAME}
     picovision
+    pico_graphics
     pimoroni_i2c
     pico_stdlib
     tinyusb_board
     tinyusb_host
-    dv_display
-    hardware_pio
-    hardware_i2c
-    hardware_uart
     fatfs
     jpegdec
     sdcard
